@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>
+Pedido #{{ pedido.id }}
+</h2>
+
+<p>
+Estado:
+<strong>{{ pedido.estado }}</strong>
+</p>
+
+<p>
+Fecha:
+{{ pedido.fecha }}
+</p>
+
+<hr>
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+
+            <th>Producto</th>
+            <th>Talla</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for item in pedido.detalles.all %}
+
+        <tr>
+
+            <td>
+                {{ item.producto.nombre }}
+            </td>
+
+            <td>
+                {{ item.talla.nombre }}
+            </td>
+
+            <td>
+                {{ item.cantidad }}
+            </td>
+
+            <td>
+                ${{ item.precio }}
+            </td>
+
+            <td>
+                ${{ item.subtotal }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+<a
+href="/pedidos/resumen/"
+class="btn btn-secondary">
+Volver
+</a>
+
+{% endblock %}
