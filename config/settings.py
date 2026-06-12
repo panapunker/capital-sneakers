@@ -191,6 +191,10 @@ AWS_QUERYSTRING_AUTH = False
 
 AWS_DEFAULT_ACL = None
 
+AWS_S3_CUSTOM_DOMAIN = (
+    "pub-adff6fea11e84b1d8e2cccb75d0a2997.r2.dev"
+)
+
 STORAGES = {
 
     "default": {
