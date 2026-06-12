@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'storages',
 
     'rest_framework',
 
@@ -162,4 +168,31 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/catalogo/'
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
+# CLOUDFARE R2
+
+AWS_ACCESS_KEY_ID = os.getenv(
+    "R2_ACCESS_KEY_ID"
+)
+
+AWS_SECRET_ACCESS_KEY = os.getenv(
+    "R2_SECRET_ACCESS_KEY"
+)
+
+AWS_STORAGE_BUCKET_NAME = os.getenv(
+    "R2_BUCKET_NAME"
+)
+
+AWS_S3_ENDPOINT_URL = os.getenv(
+    "R2_ENDPOINT_URL"
+)
+
+AWS_S3_REGION_NAME = "auto"
+
+AWS_QUERYSTRING_AUTH = False
+
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = (
+    "storages.backends.s3.S3Storage"
 )
