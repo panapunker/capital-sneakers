@@ -166,9 +166,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/catalogo/'
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+
 # CLOUDFARE R2
 
 AWS_ACCESS_KEY_ID = os.getenv(
@@ -193,6 +191,18 @@ AWS_QUERYSTRING_AUTH = False
 
 AWS_DEFAULT_ACL = None
 
-DEFAULT_FILE_STORAGE = (
-    "storages.backends.s3.S3Storage"
-)
+STORAGES = {
+
+    "default": {
+
+        "BACKEND": "storages.backends.s3.S3Storage",
+
+    },
+
+    "staticfiles": {
+
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+
+    },
+
+}
