@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+📊 Mi Dashboard
+</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+
+        <div class="card shadow p-4">
+
+            <h6>Total Comprado</h6>
+
+            <h2>
+                ${{ total_comprado }}
+            </h2>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow p-4">
+
+            <h6>Entregados</h6>
+
+            <h2>
+                {{ entregados }}
+            </h2>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow p-4">
+
+            <h6>Devueltos</h6>
+
+            <h2>
+                {{ devueltos }}
+            </h2>
+
+        </div>
+
+    </div>
+
+</div>
+
+<form method="GET" class="mb-4">
+
+    <select
+        name="estado"
+        class="form-select">
+
+        <option value="">
+            Todos los estados
+        </option>
+
+        <option value="pendiente">
+            Pendiente
+        </option>
+
+        <option value="aprobado">
+            Aprobado
+        </option>
+
+        <option value="entregado">
+            Entregado
+        </option>
+
+        <option value="devuelto">
+            Devuelto
+        </option>
+
+        <option value="cancelado">
+            Cancelado
+        </option>
+
+    </select>
+
+    <button
+        class="btn btn-primary mt-2">
+        Filtrar
+    </button>
+
+</form>
+
+<h4>
+📋 Historial Completo
+</h4>
+
+<table class="table table-striped">
+
+<thead>
+
+<tr>
+
+<th>#</th>
+<th>Fecha</th>
+<th>Estado</th>
+<th>Detalle</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for pedido in pedidos %}
+
+<tr>
+
+<td>
+#{{ pedido.id }}
+</td>
+
+<td>
+{{ pedido.fecha|date:"d/m/Y H:i" }}
+</td>
+
+<td>
+{{ pedido.estado }}
+</td>
+
+<td>
+
+<a
+href="/pedidos/detalle/{{ pedido.id }}/"
+class="btn btn-sm btn-primary">
+
+Ver
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

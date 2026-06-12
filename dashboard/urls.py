@@ -9,4 +9,10 @@ urlpatterns = [
         name='reportes_admin'
     ),
 
+    path(
+        'cliente/<int:user_id>/',
+        views.detalle_cliente,
+        name='detalle_cliente'
+    ),
+
 ]

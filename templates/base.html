@@ -155,6 +155,9 @@ class="sidebar">
     </div>
 
     <div class="sidebar-menu">
+        <a href="/pedidos/dashboard/">
+    📊 Dashboard
+</a>
 
         <a href="/catalogo/">
             📦 Lista de Productos
@@ -172,9 +175,19 @@ class="sidebar">
     📊 Reportes
 </a>
 
-        <a href="/logout/">
-            🚪 Cerrar Sesión
-        </a>
+{% if request.user.is_staff %}
+<a href="/admin/">
+    ⚙️ Panel Administrativo
+</a>
+
+<a href="/dashboard/reportes/">
+    📈 Dashboard Ventas
+</a>
+{% endif %}
+
+<a href="/logout/">
+    🚪 Cerrar Sesión
+</a>
 
     </div>
 

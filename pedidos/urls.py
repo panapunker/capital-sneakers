@@ -19,5 +19,10 @@ urlpatterns = [
     views.reportes,
     name='reportes'
 ),
+path(
+    'dashboard/',
+    views.dashboard_cliente,
+    name='dashboard_cliente'
+),
 
 ]

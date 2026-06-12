@@ -65,3 +65,53 @@ def reportes(request):
             'pedidos': pedidos
         }
     )
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def dashboard_cliente(request):
+
+    pedidos = Pedido.objects.filter(
+        cliente=request.user
+    ).order_by('-fecha')
+
+    total_comprado = 0
+    entregados = 0
+    devueltos = 0
+
+    for pedido in pedidos:
+
+        total_pedido = 0
+
+        for item in pedido.detalles.all():
+
+            total_pedido += (
+                item.precio *
+                item.cantidad
+            )
+
+        total_comprado += total_pedido
+
+        if pedido.estado == 'entregado':
+            entregados += 1
+
+        if pedido.estado == 'devuelto':
+            devueltos += 1
+
+    filtro = request.GET.get('estado')
+
+    if filtro:
+        pedidos = pedidos.filter(
+            estado=filtro
+        )
+
+    return render(
+        request,
+        'pedidos/dashboard_cliente.html',
+        {
+            'pedidos': pedidos,
+            'total_comprado': total_comprado,
+            'entregados': entregados,
+            'devueltos': devueltos
+        }
+    )

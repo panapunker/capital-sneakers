@@ -8,11 +8,13 @@ from inventario.models import Talla
 class Pedido(models.Model):
 
     ESTADOS = (
-        ('pendiente', 'Pendiente'),
-        ('aprobado', 'Aprobado'),
-        ('entregado', 'Entregado'),
-        ('cancelado', 'Cancelado'),
-    )
+    ('pendiente', 'Pendiente'),
+    ('aprobado', 'Aprobado'),
+    ('entregado', 'Entregado'),
+    ('pagado', 'Pagado'),
+    ('devuelto', 'Devuelto'),
+    ('cancelado', 'Cancelado'),
+)
 
     cliente = models.ForeignKey(
         User,
