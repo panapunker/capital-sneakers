@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from catalogo.models import Producto
 
 from pedidos.models import Pedido
 
@@ -102,5 +103,31 @@ def detalle_cliente(request, user_id):
             'cliente': cliente,
             'pedidos': pedidos,
             'total_compras': total_compras
+        }
+    )
+
+
+@staff_member_required
+def productos_admin(request):
+
+    productos = Producto.objects.all().order_by(
+        '-id'
+    )
+
+    buscar = request.GET.get(
+        'buscar'
+    )
+
+    if buscar:
+
+        productos = productos.filter(
+            nombre__icontains=buscar
+        )
+
+    return render(
+        request,
+        'dashboard/productos.html',
+        {
+            'productos': productos
         }
     )

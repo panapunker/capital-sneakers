@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block content %}
 
 <div class="row">
@@ -27,8 +29,8 @@
         </p>
 
         <h3>
-            ${{ producto.precio }}
-        </h3>
+    ${{ producto.precio|floatformat:0|intcomma }}
+</h3>
 
         <hr>
 

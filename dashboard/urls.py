@@ -14,5 +14,11 @@ urlpatterns = [
         views.detalle_cliente,
         name='detalle_cliente'
     ),
+    
+    path(
+    'productos/',
+    views.productos_admin,
+    name='productos_admin'
+),
 
 ]

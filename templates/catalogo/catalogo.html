@@ -35,9 +35,11 @@
                     Ref: {{ producto.referencia }}
                 </small>
 
-                <div class="precio mt-2">
-                    $ {{ producto.precio }}
-                </div>
+               {% load humanize %}
+
+<div class="precio mt-2">
+    $ {{ producto.precio|floatformat:0|intcomma }}
+</div>
 
                 <p class="mt-2">
                     Stock:

@@ -1,0 +1,425 @@
+/*====================================================
+    CAPITAL SNEAKERS ADMIN
+    Discord + Linear Edition v3
+====================================================*/
+
+/*====================================================
+    FUENTE
+====================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+/*====================================================
+    VARIABLES
+====================================================*/
+
+:root{
+
+    --bg:#0b1120;
+
+    --surface:#111827;
+
+    --surface-2:#172033;
+
+    --surface-3:#1e293b;
+
+    --border:#263548;
+
+    --border-strong:#334155;
+
+    --text:#f8fafc;
+
+    --text-soft:#94a3b8;
+
+    --text-muted:#64748b;
+
+    --primary:#3b82f6;
+
+    --primary-hover:#2563eb;
+
+    --success:#22c55e;
+
+    --danger:#ef4444;
+
+    --warning:#f59e0b;
+
+    --radius-sm:10px;
+
+    --radius:16px;
+
+    --radius-lg:24px;
+
+}
+
+
+/*====================================================
+    RESET GENERAL
+====================================================*/
+
+html,
+body{
+
+    margin:0;
+
+    padding:0;
+
+    font-family:'Inter',sans-serif !important;
+
+    background:var(--bg) !important;
+
+    color:var(--text) !important;
+
+    font-size:14px;
+
+    line-height:1.5;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+
+/*====================================================
+    ELEMENTOS DJANGO A ELIMINAR
+====================================================*/
+
+#nav-sidebar,
+.toggle-nav-sidebar,
+.breadcrumbs,
+#footer{
+
+    display:none !important;
+}
+
+.main{
+
+    margin-left:0 !important;
+}
+
+
+/*====================================================
+    HEADER
+====================================================*/
+
+#header{
+
+    background:#0f172a !important;
+
+    border-bottom:1px solid var(--border);
+
+    height:72px;
+
+    box-shadow:none !important;
+}
+
+
+/*====================================================
+    LOGO
+====================================================*/
+
+#site-name{
+
+    padding-top:14px;
+}
+
+#site-name a{
+
+    color:white !important;
+
+    text-decoration:none !important;
+
+    font-size:30px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+
+/*====================================================
+    USUARIO SUPERIOR
+====================================================*/
+
+#user-tools{
+
+    color:var(--text-soft) !important;
+
+    font-size:13px;
+
+    font-weight:600;
+}
+
+#user-tools a{
+
+    color:var(--text-soft) !important;
+
+    text-decoration:none !important;
+}
+
+#user-tools a:hover{
+
+    color:white !important;
+}
+
+
+/*====================================================
+    CONTENIDO
+====================================================*/
+
+#content{
+
+    padding:32px !important;
+}
+
+
+/*====================================================
+    TITULO PRINCIPAL
+====================================================*/
+
+#content h1{
+
+    color:white !important;
+
+    font-size:42px !important;
+
+    font-weight:800 !important;
+
+    margin-bottom:24px !important;
+
+    letter-spacing:-1px;
+}
+
+
+/*====================================================
+    CARD PRINCIPAL
+====================================================*/
+
+#content-main{
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    overflow:hidden;
+}
+
+
+/*====================================================
+    MODULOS DJANGO
+====================================================*/
+
+.module{
+
+    background:var(--surface) !important;
+
+    border:1px solid var(--border) !important;
+
+    border-radius:18px !important;
+
+    overflow:hidden !important;
+}
+
+
+/*====================================================
+    LINKS
+====================================================*/
+
+a{
+
+    color:#60a5fa;
+}
+
+a:hover{
+
+    color:#93c5fd;
+}
+
+
+/*====================================================
+    INPUTS
+====================================================*/
+
+input,
+textarea,
+select{
+
+    background:var(--surface-2) !important;
+
+    color:white !important;
+
+    border:1px solid var(--border) !important;
+
+    border-radius:12px !important;
+
+    min-height:44px;
+
+    padding:10px 14px !important;
+
+    transition:.2s;
+}
+
+
+/*====================================================
+    FOCUS
+====================================================*/
+
+input:focus,
+textarea:focus,
+select:focus{
+
+    outline:none !important;
+
+    border-color:var(--primary) !important;
+
+    box-shadow:
+    0 0 0 3px rgba(59,130,246,.15) !important;
+}
+
+
+/*====================================================
+    LABELS
+====================================================*/
+
+label{
+
+    color:var(--text) !important;
+
+    font-weight:600 !important;
+}
+
+
+/*====================================================
+    BOTONES
+====================================================*/
+
+.button,
+input[type="submit"],
+.submit-row input,
+.object-tools a{
+
+    background:var(--primary) !important;
+
+    color:white !important;
+
+    border:none !important;
+
+    border-radius:12px !important;
+
+    min-height:42px;
+
+    padding:10px 18px !important;
+
+    font-weight:600 !important;
+
+    display:inline-flex !important;
+
+    align-items:center !important;
+
+    justify-content:center !important;
+
+    text-decoration:none !important;
+
+    transition:.2s;
+}
+
+
+/*====================================================
+    BOTONES HOVER
+====================================================*/
+
+.button:hover,
+input[type="submit"]:hover,
+.submit-row input:hover,
+.object-tools a:hover{
+
+    background:var(--primary-hover) !important;
+
+    transform:translateY(-1px);
+}
+
+
+/*====================================================
+    BOTON ELIMINAR
+====================================================*/
+
+.deletelink{
+
+    background:var(--danger) !important;
+
+    color:white !important;
+}
+
+.deletelink:hover{
+
+    background:#dc2626 !important;
+}
+
+
+/*====================================================
+    MENSAJES DJANGO
+====================================================*/
+
+.success{
+
+    background:#052e16 !important;
+
+    color:#bbf7d0 !important;
+
+    border:1px solid #166534 !important;
+
+    border-radius:12px !important;
+}
+
+.warning{
+
+    background:#451a03 !important;
+
+    color:#fde68a !important;
+
+    border:1px solid #92400e !important;
+
+    border-radius:12px !important;
+}
+
+.errornote{
+
+    background:#450a0a !important;
+
+    color:#fecaca !important;
+
+    border:1px solid #991b1b !important;
+
+    border-radius:12px !important;
+}
+
+
+/*====================================================
+    ANIMACION SUAVE
+====================================================*/
+
+#content-main{
+
+    animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(8px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+    }
+}
