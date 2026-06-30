@@ -103,7 +103,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 USE_R2 = config('USE_R2', default=False, cast=bool)
 
 if USE_R2:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID     = config('R2_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = config('R2_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = config('R2_BUCKET_NAME')
@@ -113,6 +112,15 @@ if USE_R2:
     AWS_QUERYSTRING_AUTH  = False
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_SIGNATURE_VERSION = 's3v4'
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # ── Autenticación ───────────────────────────────────────────────
 AUTH_USER_MODEL = 'accounts.User'
