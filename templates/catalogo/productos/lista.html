@@ -1,0 +1,136 @@
+{% extends "catalogo/base_catalogo.html" %}
+
+{% block catalogo_content %}
+<div class="catalogo-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2><i class="bi bi-box-seam me-2"></i>Productos</h2>
+        <p>Administra el catálogo de productos</p>
+    </div>
+    <a href="{% url 'catalogo:crear_producto' %}" class="btn btn-primary-custom">
+        <i class="bi bi-plus-lg me-1"></i> Nuevo Producto
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Filtros -->
+<div class="card border-0 shadow-sm rounded-3 mb-4 p-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+            <label class="form-label">Buscar</label>
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Nombre o referencia...">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Género</label>
+            <select name="genero" class="form-select">
+                <option value="">Todos</option>
+                <option value="dama" {% if genero_sel == 'dama' %}selected{% endif %}>Dama</option>
+                <option value="caballero" {% if genero_sel == 'caballero' %}selected{% endif %}>Caballero</option>
+                <option value="nino" {% if genero_sel == 'nino' %}selected{% endif %}>Niño</option>
+                <option value="ambos" {% if genero_sel == 'ambos' %}selected{% endif %}>Ambos</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-select">
+                <option value="">Todas</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.pk }}" {% if categoria_sel == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Marca</label>
+            <select name="marca" class="form-select">
+                <option value="">Todas</option>
+                {% for m in marcas %}
+                    <option value="{{ m.pk }}" {% if marca_sel == m.pk|stringformat:"s" %}selected{% endif %}>{{ m.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+            <a href="{% url 'catalogo:lista_productos' %}" class="btn btn-outline-secondary w-100" style="border-radius:10px;">
+                <i class="bi bi-x"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="card table-card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Referencia</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Género</th>
+                    <th>Precio Venta</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>
+                        {% if producto.imagen_principal %}
+                            <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}"
+                                 style="width:48px; height:48px; object-fit:cover; border-radius:8px;">
+                        {% else %}
+                            <div style="width:48px; height:48px; background:#f0f0f0; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="fw-semibold">{{ producto.nombre }}</td>
+                    <td><code>{{ producto.referencia }}</code></td>
+                    <td>{{ producto.marca }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>{{ producto.get_genero_display }}</td>
+                    <td class="fw-bold">${{ producto.precio_venta }}</td>
+                    <td>
+                        {% if producto.activo %}
+                            <span class="badge-activo">Activo</span>
+                        {% else %}
+                            <span class="badge-inactivo">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'catalogo:detalle_producto' producto.pk %}" class="btn btn-accion btn-ver me-1">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'catalogo:editar_producto' producto.pk %}" class="btn btn-accion btn-editar me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'catalogo:eliminar_producto' producto.pk %}" class="btn btn-accion btn-eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        No hay productos registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

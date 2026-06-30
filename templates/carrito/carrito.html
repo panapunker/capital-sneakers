@@ -1,0 +1,240 @@
+{% extends 'base_cliente.html' %}
+{% load humanize %}
+
+{% block title %}Mi Carrito{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">
+        <i class="bi bi-cart3 me-2 text-primary"></i>Mi Carrito
+      </h2>
+      <small class="text-muted">
+        {% if total_items > 0 %}
+          {{ total_items }} artículo{% if total_items != 1 %}s{% endif %} en tu carrito
+        {% else %}
+          Tu carrito está vacío
+        {% endif %}
+      </small>
+    </div>
+    <a href="{% url 'catalogo:catalogo_cliente' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Seguir comprando
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if items_con_stock %}
+  <div class="row g-4">
+
+    <!-- Tabla de productos -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0 fw-semibold">Productos seleccionados</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Producto</th>
+                  <th class="text-center">Talla</th>
+                  <th class="text-center">Cantidad</th>
+                  <th class="text-end">Precio</th>
+                  <th class="text-end">Subtotal</th>
+                  <th class="text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in items_con_stock %}
+                {% with item=entry.item %}
+                <tr>
+                  <!-- Imagen + Nombre -->
+                  <td class="ps-4">
+                    <div class="d-flex align-items-center gap-3">
+                      {% if item.producto.imagen_principal %}
+                        <img src="{{ item.producto.imagen_principal.url }}"
+                             alt="{{ item.producto.nombre }}"
+                             class="rounded"
+                             style="width:60px;height:60px;object-fit:cover;">
+                      {% else %}
+                        <div class="rounded bg-light d-flex align-items-center justify-content-center"
+                             style="width:60px;height:60px;">
+                          <i class="bi bi-image text-muted fs-4"></i>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <div class="fw-semibold">{{ item.producto.nombre }}</div>
+                        <small class="text-muted">{{ item.producto.marca.nombre }}</small><br>
+                        <small class="text-muted">Ref: {{ item.producto.referencia }}</small>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Talla -->
+                  <td class="text-center">
+                    <span class="badge bg-secondary fs-6 px-3 py-2">{{ item.talla }}</span>
+                  </td>
+
+                  <!-- Cantidad con botones + / - -->
+                  <td class="text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+
+                      <form method="post" action="{% url 'carrito:actualizar_cantidad' item.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="decrementar">
+                        <button type="submit"
+                                class="btn btn-outline-secondary btn-sm px-2 py-1"
+                                title="Disminuir">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                      </form>
+
+                      <span class="fw-bold mx-2 fs-6" style="min-width:28px;">{{ item.cantidad }}</span>
+
+                      <form method="post" action="{% url 'carrito:actualizar_cantidad' item.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="incrementar">
+                        <button type="submit"
+                                class="btn btn-outline-secondary btn-sm px-2 py-1"
+                                {% if item.cantidad >= entry.stock %}disabled{% endif %}
+                                title="Aumentar">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </form>
+
+                    </div>
+                    {% if entry.stock <= 3 and entry.stock > 0 %}
+                      <small class="text-warning d-block mt-1">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Solo {{ entry.stock }} disponibles
+                      </small>
+                    {% endif %}
+                  </td>
+
+                  <!-- Precio unitario -->
+                  <td class="text-end">
+                    <span class="text-muted">${{ item.precio_unitario|intcomma }}</span>
+                  </td>
+
+                  <!-- Subtotal -->
+                  <td class="text-end">
+                    <span class="fw-semibold text-dark">${{ entry.subtotal|intcomma }}</span>
+                  </td>
+
+                  <!-- Eliminar -->
+                  <td class="text-center">
+                    <form method="post" action="{% url 'carrito:eliminar_item' item.id %}">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="btn btn-outline-danger btn-sm"
+                              onclick="return confirm('¿Eliminar este producto del carrito?')"
+                              title="Eliminar">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Vaciar carrito -->
+        <div class="card-footer bg-white border-top py-3 d-flex justify-content-end">
+          <form method="post" action="{% url 'carrito:vaciar_carrito' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('¿Vaciar todo el carrito?')">
+              <i class="bi bi-trash3 me-1"></i>Vaciar carrito
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen y confirmar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0 fw-semibold">Resumen del pedido</h5>
+        </div>
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Productos</span>
+            <span>{{ carrito.get_cantidad_productos }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Total artículos</span>
+            <span>{{ total_items }}</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <span class="fw-bold fs-5">Total</span>
+            <span class="fw-bold fs-5 text-primary">${{ total|intcomma }}</span>
+          </div>
+
+          <form method="post" action="{% url 'carrito:confirmar_carrito' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="metodo_pago" class="form-label fw-semibold">Método de pago</label>
+              <select name="metodo_pago" id="metodo_pago" class="form-select">
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="tarjeta">Tarjeta</option>
+                <option value="credito">Crédito</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+              <textarea name="observaciones" id="observaciones"
+                        class="form-control" rows="2"
+                        placeholder="Opcional..."></textarea>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg"
+                      onclick="return confirm('¿Confirmar el pedido?')">
+                <i class="bi bi-check-circle me-2"></i>Confirmar pedido
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {% else %}
+  <!-- Carrito vacío -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+      <h4 class="text-muted">Tu carrito está vacío</h4>
+      <p class="text-muted mb-4">Agrega productos desde el catálogo para comenzar.</p>
+      <a href="{% url 'catalogo:catalogo_cliente' %}" class="btn btn-primary">
+        <i class="bi bi-bag me-2"></i>Ver catálogo
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

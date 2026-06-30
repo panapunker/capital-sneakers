@@ -1,0 +1,536 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard Administrativo{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">
+        <i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard
+      </h2>
+      <small class="text-muted">Resumen general del negocio</small>
+    </div>
+    <div class="text-muted small">
+      <i class="bi bi-clock me-1"></i>
+      {% now "d/m/Y H:i" %}
+    </div>
+  </div>
+
+  <!-- ── Tarjetas Ventas ─────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Ventas Hoy</div>
+              <div class="fw-bold fs-5">${{ ventas_hoy.total_ventas|intcomma }}</div>
+              <div class="text-muted small">{{ ventas_hoy.total_pedidos }} pedidos</div>
+            </div>
+            <div class="bg-success bg-opacity-10 rounded-3 p-2">
+              <i class="bi bi-cash-stack text-success fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Ventas del Mes</div>
+              <div class="fw-bold fs-5">${{ ventas_mes.total_ventas|intcomma }}</div>
+              <div class="text-muted small">{{ ventas_mes.total_pedidos }} pedidos</div>
+            </div>
+            <div class="bg-primary bg-opacity-10 rounded-3 p-2">
+              <i class="bi bi-calendar-month text-primary fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Ventas del Año</div>
+              <div class="fw-bold fs-5">${{ ventas_anio.total_ventas|intcomma }}</div>
+              <div class="text-muted small">{{ ventas_anio.total_pedidos }} pedidos</div>
+            </div>
+            <div class="bg-info bg-opacity-10 rounded-3 p-2">
+              <i class="bi bi-calendar-year text-info fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Utilidad del Mes</div>
+              <div class="fw-bold fs-5">${{ ventas_mes.utilidad|intcomma }}</div>
+              <div class="text-muted small">Costo: ${{ ventas_mes.costo_total|intcomma }}</div>
+            </div>
+            <div class="bg-warning bg-opacity-10 rounded-3 p-2">
+              <i class="bi bi-graph-up-arrow text-warning fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Tarjetas Pedidos ────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-warning border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Pendientes</div>
+          <div class="fw-bold fs-4 text-warning">{{ pedidos.pendientes }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-primary border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Confirmados</div>
+          <div class="fw-bold fs-4 text-primary">{{ pedidos.confirmados }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-info border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Enviados</div>
+          <div class="fw-bold fs-4 text-info">{{ pedidos.enviados }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-success border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Entregados</div>
+          <div class="fw-bold fs-4 text-success">{{ pedidos.entregados }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-danger border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Cancelados</div>
+          <div class="fw-bold fs-4 text-danger">{{ pedidos.cancelados }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm h-100 border-start border-secondary border-3">
+        <div class="card-body py-3">
+          <div class="text-muted small">Devueltos</div>
+          <div class="fw-bold fs-4 text-secondary">{{ pedidos.devueltos }}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Tarjetas Inventario ─────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Productos Activos</div>
+          <div class="fw-bold fs-5">{{ inventario.total_productos }}</div>
+          <div class="text-muted small">{{ inventario.total_unidades }} unidades</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Valor Inventario</div>
+          <div class="fw-bold fs-5">${{ inventario.valor_compra|intcomma }}</div>
+          <div class="text-muted small">Precio compra</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Valor Potencial</div>
+          <div class="fw-bold fs-5 text-success">${{ inventario.valor_venta|intcomma }}</div>
+          <div class="text-muted small">Precio venta</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Stock Bajo / Sin Stock</div>
+          <div class="fw-bold fs-5">
+            <span class="text-warning">{{ inventario.stock_bajo }}</span>
+            /
+            <span class="text-danger">{{ inventario.sin_stock }}</span>
+          </div>
+          <div class="text-muted small">Referencias</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Tarjetas Devoluciones ───────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Devoluciones del Mes</div>
+              <div class="fw-bold fs-5">{{ devoluciones_mes }}</div>
+            </div>
+            <div class="bg-secondary bg-opacity-10 rounded-3 p-2">
+              <i class="bi bi-arrow-return-left text-secondary fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Pendientes</div>
+          <div class="fw-bold fs-5 text-warning">{{ devoluciones.pendientes }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Aprobadas</div>
+          <div class="fw-bold fs-5 text-success">{{ devoluciones.aprobadas }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small mb-1">Finalizadas</div>
+          <div class="fw-bold fs-5 text-secondary">{{ devoluciones.finalizadas }}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Gráficas ────────────────────────────────────────────── -->
+  <div class="row g-4 mb-4">
+
+    <!-- Ventas por mes -->
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-bar-chart-line me-2 text-primary"></i>Ventas por Mes
+          </h6>
+        </div>
+        <div class="card-body">
+          <canvas id="chartVentas" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pedidos por estado -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-pie-chart me-2 text-primary"></i>Pedidos por Estado
+          </h6>
+        </div>
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <canvas id="chartPedidos" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row g-4 mb-4">
+
+    <!-- Productos más vendidos -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-trophy me-2 text-warning"></i>Productos Más Vendidos
+          </h6>
+        </div>
+        <div class="card-body">
+          <canvas id="chartProductos" height="150"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventario por categoría -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-box-seam me-2 text-info"></i>Inventario por Categoría
+          </h6>
+        </div>
+        <div class="card-body">
+          <canvas id="chartCategorias" height="150"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Tablas ──────────────────────────────────────────────── -->
+  <div class="row g-4">
+
+    <!-- Pedidos recientes -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-clock-history me-2 text-primary"></i>Pedidos Recientes
+          </h6>
+          <a href="{% url 'pedidos:pedido_lista' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Cliente</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pedido in pedidos_recientes %}
+                <tr>
+                  <td class="ps-3">
+                    <a href="{% url 'pedidos:pedido_detalle' pedido.id %}" class="text-decoration-none">
+                      #{{ pedido.id }}
+                    </a>
+                  </td>
+                  <td>{{ pedido.cliente.nombre_completo }}</td>
+                  <td>${{ pedido.total|intcomma }}</td>
+                  <td>
+                    {% if pedido.estado == 'pendiente' %}
+                      <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif pedido.estado == 'confirmado' %}
+                      <span class="badge bg-primary">Confirmado</span>
+                    {% elif pedido.estado == 'enviado' %}
+                      <span class="badge bg-info">Enviado</span>
+                    {% elif pedido.estado == 'entregado' %}
+                      <span class="badge bg-success">Entregado</span>
+                    {% elif pedido.estado == 'cancelado' %}
+                      <span class="badge bg-danger">Cancelado</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ pedido.estado }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-3">Sin pedidos recientes</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clientes top -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between">
+          <h6 class="fw-semibold mb-0">
+            <i class="bi bi-people me-2 text-success"></i>Mejores Clientes
+          </h6>
+          <a href="{% url 'dashboard:reporte_clientes' %}" class="btn btn-sm btn-outline-success">Ver reporte</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">Cliente</th>
+                  <th class="text-center">Pedidos</th>
+                  <th class="text-end pe-3">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in clientes_top %}
+                <tr>
+                  <td class="ps-3">{{ c.nombre_completo }}</td>
+                  <td class="text-center">{{ c.total_pedidos }}</td>
+                  <td class="text-end pe-3">${{ c.total_comprado|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-3">Sin datos</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // ── Datos desde Django ──────────────────────────────────────
+  const ventasLabels  = JSON.parse('{{ chart_ventas_labels|escapejs }}');
+  const ventasData    = JSON.parse('{{ chart_ventas_data|escapejs }}');
+  const pedidosLabels = JSON.parse('{{ chart_pedidos_labels|escapejs }}');
+  const pedidosData   = JSON.parse('{{ chart_pedidos_data|escapejs }}');
+  const prodLabels    = JSON.parse('{{ chart_productos_labels|escapejs }}');
+  const prodData      = JSON.parse('{{ chart_productos_data|escapejs }}');
+  const catLabels     = JSON.parse('{{ chart_categorias_labels|escapejs }}');
+  const catData       = JSON.parse('{{ chart_categorias_data|escapejs }}');
+
+  // ── Chart Ventas por Mes ────────────────────────────────────
+  new Chart(document.getElementById('chartVentas'), {
+    type: 'bar',
+    data: {
+      labels: ventasLabels,
+      datasets: [{
+        label: 'Ventas ($)',
+        data: ventasData,
+        backgroundColor: 'rgba(13,110,253,0.7)',
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  // ── Chart Pedidos por Estado ────────────────────────────────
+  new Chart(document.getElementById('chartPedidos'), {
+    type: 'doughnut',
+    data: {
+      labels: pedidosLabels,
+      datasets: [{
+        data: pedidosData,
+        backgroundColor: ['#ffc107','#0d6efd','#0dcaf0','#198754','#dc3545','#6c757d'],
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+
+  // ── Chart Productos más vendidos ────────────────────────────
+  new Chart(document.getElementById('chartProductos'), {
+    type: 'bar',
+    data: {
+      labels: prodLabels,
+      datasets: [{
+        label: 'Unidades vendidas',
+        data: prodData,
+        backgroundColor: 'rgba(255,193,7,0.8)',
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true } }
+    }
+  });
+
+  // ── Chart Inventario por Categoría ──────────────────────────
+  new Chart(document.getElementById('chartCategorias'), {
+    type: 'pie',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        data: catData,
+        backgroundColor: [
+          '#0d6efd','#198754','#ffc107','#dc3545',
+          '#0dcaf0','#6f42c1','#fd7e14','#20c997'
+        ],
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+
+<script>
+// Auto-refresh cada 15 segundos si el usuario no interactúa
+let timerRefresh = null;
+let usuarioActivo = false;
+
+function resetTimer() {
+    usuarioActivo = true;
+    clearTimeout(timerRefresh);
+    timerRefresh = setTimeout(() => {
+        usuarioActivo = false;
+    }, 5000);
+}
+
+document.addEventListener('mousemove', resetTimer);
+document.addEventListener('keypress', resetTimer);
+document.addEventListener('click', resetTimer);
+
+setInterval(() => {
+    if (!usuarioActivo) {
+        location.reload();
+    }
+}, 15000);
+</script>
+{% endblock %}

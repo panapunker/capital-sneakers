@@ -1,0 +1,122 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Crear Devolución{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="mb-4">
+    <h2 class="fw-bold mb-0">
+      <i class="bi bi-arrow-return-left me-2 text-primary"></i>Nueva Devolución
+    </h2>
+    <small class="text-muted">Pedido #{{ pedido.id }} — {{ pedido.cliente.nombre_completo }}</small>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="row g-4">
+
+      <!-- Datos generales -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-semibold mb-0">Información General</h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tipo de devolución</label>
+              {{ form.tipo }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Motivo general</label>
+              {{ form.motivo }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Observaciones</label>
+              {{ form.observaciones }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos del pedido -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-semibold mb-0">Selecciona los productos a devolver</h6>
+          </div>
+          <div class="card-body">
+
+            {% for detalle in detalles_disponibles %}
+            <div class="border rounded-3 p-3 mb-3">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox"
+                       name="detalle_pedido_id" value="{{ detalle.id }}"
+                       id="check_{{ detalle.id }}">
+                <label class="form-check-label fw-semibold" for="check_{{ detalle.id }}">
+                  {{ detalle.producto.nombre }} — Talla {{ detalle.talla }}
+                  (Comprado: {{ detalle.cantidad }} uds — ${{ detalle.precio_unitario|intcomma }})
+                </label>
+              </div>
+
+              <div class="row g-2 mt-2">
+                <div class="col-6 col-md-3">
+                  <label class="form-label small">Cantidad a devolver</label>
+                  <input type="number" class="form-control form-control-sm"
+                         name="cantidad_{{ detalle.id }}"
+                         value="{{ detalle.cantidad }}" min="1" max="{{ detalle.cantidad }}">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label small">Estado del producto</label>
+                  <select class="form-select form-select-sm" name="estado_producto_{{ detalle.id }}">
+                    <option value="nuevo">Nuevo</option>
+                    <option value="usado">Usado</option>
+                    <option value="defectuoso">Defectuoso</option>
+                    <option value="danado">Dañado</option>
+                  </select>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label small">Cambiar talla (opcional)</label>
+                  <select class="form-select form-select-sm" name="talla_nueva_{{ detalle.id }}">
+                    <option value="">-- Sin cambio --</option>
+                    {% for codigo, etiqueta in tallas_choices %}
+                      <option value="{{ codigo }}">{{ etiqueta }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label small">Motivo específico</label>
+                  <input type="text" class="form-control form-control-sm"
+                         name="motivo_{{ detalle.id }}" placeholder="Opcional">
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-check-circle me-2"></i>Crear Devolución
+      </button>
+      <a href="{% url 'pedidos:pedido_detalle' pedido.id %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Cancelar
+      </a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

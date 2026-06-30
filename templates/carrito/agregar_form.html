@@ -1,0 +1,35 @@
+{% load humanize %}
+
+<!-- 
+  Fragment reutilizable para agregar al carrito desde cualquier vista.
+  Incluir con: {% include 'carrito/agregar_form.html' with producto=producto %}
+-->
+<form method="post" action="{% url 'carrito:agregar_item' %}">
+  {% csrf_token %}
+  <input type="hidden" name="producto_id" value="{{ producto.id }}">
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Talla</label>
+    <select name="talla" class="form-select" required>
+      <option value="">-- Selecciona talla --</option>
+      {% for inv in producto.inventarios.all %}
+        {% if inv.cantidad > 0 %}
+          <option value="{{ inv.talla }}">
+            Talla {{ inv.talla }} ({{ inv.cantidad }} disponibles)
+          </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Cantidad</label>
+    <input type="number" name="cantidad" value="1" min="1" class="form-control">
+  </div>
+
+  <div class="d-grid">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
+    </button>
+  </div>
+</form>

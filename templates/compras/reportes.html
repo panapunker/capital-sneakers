@@ -1,0 +1,280 @@
+{% extends "compras/base_compras.html" %}
+{% load humanize %}
+
+{% block title %}Reporte de Compras — Capital Sneakers{% endblock %}
+
+{% block compras_content %}
+<div class="compras-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2><i class="bi bi-bar-chart-line me-2"></i>Reporte de Compras</h2>
+        <p>Análisis de órdenes de compra y proveedores</p>
+    </div>
+    <a href="{% url 'compras:compra_lista' %}" class="btn btn-outline-light rounded-3 px-4">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Filtros -->
+<div class="filtros-card">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-3">
+            <label class="form-label">Desde</label>
+            <input type="date" name="fecha_inicio" value="{{ filtros.fecha_inicio }}"
+                   class="form-control">
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label">Hasta</label>
+            <input type="date" name="fecha_fin" value="{{ filtros.fecha_fin }}"
+                   class="form-control">
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label">Proveedor</label>
+            <select name="proveedor" class="form-select">
+                <option value="">Todos</option>
+                {% for p in proveedores %}
+                <option value="{{ p.id }}"
+                    {% if filtros.proveedor == p.id|stringformat:"s" %}selected{% endif %}>
+                    {{ p.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 col-md-2">
+            <button type="submit" class="btn-primary-custom btn w-100">
+                <i class="bi bi-search me-1"></i> Filtrar
+            </button>
+        </div>
+        <div class="col-12 col-md-1">
+            <a href="{% url 'compras:reporte_compras' %}"
+               class="btn btn-outline-secondary rounded-3 w-100">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Métricas -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="metric-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="metric-icon bg-primary bg-opacity-10">
+                    <i class="bi bi-cart-check text-primary"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Total Compras</p>
+                    <h4 class="fw-bold mb-0">{{ metricas.total_compras }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="metric-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="metric-icon bg-success bg-opacity-10">
+                    <i class="bi bi-currency-dollar text-success"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Total Invertido</p>
+                    <h4 class="fw-bold mb-0">${{ metricas.total_invertido|floatformat:0|intcomma }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="metric-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="metric-icon bg-warning bg-opacity-10">
+                    <i class="bi bi-check2-circle text-warning"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Recibidas</p>
+                    <h4 class="fw-bold mb-0">{{ metricas.compras_recibidas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="metric-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="metric-icon bg-danger bg-opacity-10">
+                    <i class="bi bi-x-circle text-danger"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Canceladas</p>
+                    <h4 class="fw-bold mb-0">{{ metricas.compras_canceladas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficas -->
+<div class="row g-4 mb-4">
+
+    <!-- Compras por proveedor -->
+    <div class="col-12 col-xl-6">
+        <div class="metric-card">
+            <h6 class="fw-bold mb-4">
+                <i class="bi bi-bar-chart me-2 text-primary"></i>Inversión por proveedor
+            </h6>
+            <canvas id="graficaProveedores" style="max-height:280px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Productos más comprados -->
+    <div class="col-12 col-xl-6">
+        <div class="metric-card">
+            <h6 class="fw-bold mb-4">
+                <i class="bi bi-trophy me-2 text-warning"></i>Productos más comprados
+            </h6>
+            <canvas id="graficaProductos" style="max-height:280px;"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Tabla top proveedores -->
+<div class="card table-card mb-4">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>Proveedor</th>
+                    <th class="text-center">Compras</th>
+                    <th class="text-end">Total invertido</th>
+                    <th class="text-end pe-4">Promedio por compra</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prov in top_proveedores %}
+                <tr>
+                    <td class="ps-4 text-muted">{{ forloop.counter }}</td>
+                    <td class="fw-semibold">{{ prov.nombre }}</td>
+                    <td class="text-center">{{ prov.total_compras }}</td>
+                    <td class="text-end fw-bold">${{ prov.total_invertido|floatformat:0|intcomma }}</td>
+                    <td class="text-end pe-4 text-muted">
+                        ${{ prov.promedio|floatformat:0|intcomma }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        Sin datos para el período.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Tabla top productos comprados -->
+<div class="card table-card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>Producto</th>
+                    <th class="text-center">Unidades compradas</th>
+                    <th class="text-end pe-4">Total invertido</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in top_productos %}
+                <tr>
+                    <td class="ps-4 text-muted">{{ forloop.counter }}</td>
+                    <td class="fw-semibold">
+                        {{ item.producto__nombre }}
+                        <br>
+                        <small class="text-muted">{{ item.producto__marca__nombre }}</small>
+                    </td>
+                    <td class="text-center fw-semibold">{{ item.total_unidades }}</td>
+                    <td class="text-end fw-bold pe-4">
+                        ${{ item.total_invertido|floatformat:0|intcomma }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        Sin datos para el período.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+// @ts-nocheck
+const graficaProveedores = {{ grafica_proveedores | safe }};
+const graficaProductos   = {{ grafica_productos   | safe }};
+
+new Chart(document.getElementById('graficaProveedores'), {
+    type: 'bar',
+    data: {
+        labels: graficaProveedores.labels,
+        datasets: [{
+            label: 'Total invertido ($)',
+            data: graficaProveedores.datos,
+            backgroundColor: 'rgba(13,110,253,0.75)',
+            borderColor: '#0d6efd',
+            borderWidth: 2,
+            borderRadius: 6,
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                ticks: { callback: v => '$' + v.toLocaleString('es-CO') },
+                grid: { color: 'rgba(0,0,0,0.05)' },
+            },
+        },
+    },
+});
+
+new Chart(document.getElementById('graficaProductos'), {
+    type: 'bar',
+    data: {
+        labels: graficaProductos.labels,
+        datasets: [{
+            label: 'Unidades compradas',
+            data: graficaProductos.datos,
+            backgroundColor: 'rgba(233,69,96,0.75)',
+            borderColor: '#e94560',
+            borderWidth: 2,
+            borderRadius: 6,
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                grid: { color: 'rgba(0,0,0,0.05)' },
+            },
+        },
+    },
+});
+</script>
+{% endblock %}

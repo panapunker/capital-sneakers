@@ -1,0 +1,164 @@
+{% extends "compras/base_compras.html" %}
+
+{% block title %}Agregar Productos — Compra #{{ compra.id }}{% endblock %}
+
+{% block compras_content %}
+<div class="compras-header d-flex justify-content-between align-items-center">
+    <div>
+        <a href="{% url 'compras:compra_detalle' compra.id %}" class="text-white text-decoration-none small opacity-75">
+            <i class="bi bi-arrow-left me-1"></i> Detalle de compra
+        </a>
+        <h2 class="mt-2">Agregar Productos</h2>
+        <p>Compra #{{ compra.id }} &mdash; {{ compra.proveedor.empresa }}</p>
+    </div>
+    <a href="{% url 'compras:compra_detalle' compra.id %}"
+       class="btn-primary-custom btn">
+        <i class="bi bi-check-circle me-1"></i> Finalizar
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row g-4">
+
+    <!-- Formulario -->
+    <div class="col-12 col-lg-4">
+        <div class="form-card">
+            <h6 class="fw-bold mb-4">
+                <i class="bi bi-plus-circle me-2 text-success"></i>Agregar producto
+            </h6>
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Producto -->
+                <div class="mb-3">
+                    <label class="form-label">Producto</label>
+                    {{ form.producto }}
+                    {% if form.producto.errors %}
+                        <div class="text-danger small mt-1">{{ form.producto.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Talla -->
+                <div class="mb-3">
+                    <label class="form-label">Talla</label>
+                    {{ form.talla }}
+                    {% if form.talla.errors %}
+                        <div class="text-danger small mt-1">{{ form.talla.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Cantidad -->
+                <div class="mb-3">
+                    <label class="form-label">Cantidad</label>
+                    {{ form.cantidad }}
+                    {% if form.cantidad.errors %}
+                        <div class="text-danger small mt-1">{{ form.cantidad.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Costo unitario -->
+                <div class="mb-4">
+                    <label class="form-label">Costo unitario</label>
+                    {{ form.costo_unitario }}
+                    {% if form.costo_unitario.errors %}
+                        <div class="text-danger small mt-1">{{ form.costo_unitario.errors }}</div>
+                    {% endif %}
+                    <div class="form-text text-muted small">
+                        El subtotal se calculará automáticamente.
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn-primary-custom btn py-2">
+                        <i class="bi bi-plus-lg me-1"></i> Agregar al pedido
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de productos agregados -->
+    <div class="col-12 col-lg-8">
+        <div class="card table-card">
+            <div class="d-flex justify-content-between align-items-center px-4 py-3"
+                 style="background:#1a1a2e; border-radius:16px 16px 0 0;">
+                <h6 class="text-white fw-semibold mb-0">
+                    <i class="bi bi-list-check me-2"></i>Productos en esta compra
+                </h6>
+                <span class="badge bg-success rounded-pill px-3 fs-6">
+                    Total: ${{ compra.total }}
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Producto</th>
+                            <th class="text-center">Talla</th>
+                            <th class="text-center">Cant.</th>
+                            <th class="text-end">Costo unit.</th>
+                            <th class="text-end">Subtotal</th>
+                            <th class="text-center pe-4">Quitar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                        <tr>
+                            <td class="ps-4 fw-semibold">
+                                {{ detalle.producto.nombre }}
+                                <br>
+                                <small class="text-muted">{{ detalle.producto.marca.nombre }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border rounded-pill px-3">
+                                    {{ detalle.talla }}
+                                </span>
+                            </td>
+                            <td class="text-center fw-semibold">{{ detalle.cantidad }}</td>
+                            <td class="text-end text-muted">${{ detalle.costo_unitario }}</td>
+                            <td class="text-end fw-bold">${{ detalle.subtotal }}</td>
+                            <td class="text-center pe-4">
+                                <a href="{% url 'compras:compra_eliminar_detalle' detalle.id %}"
+                                   class="btn-accion btn-eliminar btn"
+                                   onclick="return confirm('¿Quitar este producto?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                Sin productos aún. Agrega el primero.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if detalles %}
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="ps-4 fw-bold text-end"
+                                style="background:#1a1a2e; color:white;">Total</td>
+                            <td class="text-end fw-bold"
+                                style="background:#1a1a2e; color:white;">${{ compra.total }}</td>
+                            <td style="background:#1a1a2e;"></td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "catalogo/base_catalogo.html" %}
+
+{% block catalogo_content %}
+<div class="catalogo-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2><i class="bi bi-award me-2"></i>Marcas</h2>
+        <p>Administra las marcas de productos</p>
+    </div>
+    <a href="{% url 'catalogo:crear_marca' %}" class="btn btn-primary-custom">
+        <i class="bi bi-plus-lg me-1"></i> Nueva Marca
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="card table-card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for marca in marcas %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-semibold">{{ marca.nombre }}</td>
+                    <td>
+                        {% if marca.activo %}
+                            <span class="badge-activo">Activo</span>
+                        {% else %}
+                            <span class="badge-inactivo">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'catalogo:editar_marca' marca.pk %}" class="btn btn-accion btn-editar me-1">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a href="{% url 'catalogo:eliminar_marca' marca.pk %}" class="btn btn-accion btn-eliminar">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        No hay marcas registradas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

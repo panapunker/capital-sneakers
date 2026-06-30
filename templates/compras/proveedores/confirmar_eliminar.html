@@ -1,0 +1,42 @@
+{% extends "compras/base_compras.html" %}
+
+{% block title %}Eliminar Proveedor — Capital Sneakers{% endblock %}
+
+{% block compras_content %}
+<div class="compras-header">
+    <a href="{% url 'compras:proveedor_lista' %}" class="text-white text-decoration-none small opacity-75">
+        <i class="bi bi-arrow-left me-1"></i> Proveedores
+    </a>
+    <h2 class="mt-2">Eliminar Proveedor</h2>
+</div>
+
+<div class="confirmar-card">
+    <div class="icono-eliminar">
+        <i class="bi bi-trash3"></i>
+    </div>
+    <h4 class="fw-bold mb-2">¿Eliminar este proveedor?</h4>
+    <p class="text-muted mb-1">Estás a punto de eliminar:</p>
+    <p class="fw-semibold fs-5 mb-1">{{ proveedor.nombre }}</p>
+    {% if proveedor.nit %}
+        <p class="text-muted small mb-3">NIT: {{ proveedor.nit }}</p>
+    {% endif %}
+    <div class="alert alert-warning rounded-3 text-start small mb-4">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        Esta acción no se puede deshacer. Si el proveedor tiene compras asociadas,
+        no podrá eliminarse.
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">
+                <i class="bi bi-trash me-1"></i> Sí, eliminar
+            </button>
+            <a href="{% url 'compras:proveedor_lista' %}"
+               class="btn btn-outline-secondary rounded-3 px-4">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

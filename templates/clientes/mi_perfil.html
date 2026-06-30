@@ -1,0 +1,124 @@
+{% extends 'base_cliente.html' %}
+{% block title %}Mi Perfil — Capital Sneakers{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4">
+    <i class="bi bi-person me-2 text-primary"></i>Mi Perfil
+  </h4>
+  <div class="row g-4">
+
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-bold mb-0">Datos personales</h6>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-5 text-muted small">Nombre</dt>
+            <dd class="col-7">{{ cliente.nombre_completo }}</dd>
+            <dt class="col-5 text-muted small">Documento</dt>
+            <dd class="col-7">{{ cliente.documento }}</dd>
+            <dt class="col-5 text-muted small">Teléfono</dt>
+            <dd class="col-7">{{ cliente.telefono }}</dd>
+            <dt class="col-5 text-muted small">Correo</dt>
+            <dd class="col-7">{{ cliente.correo }}</dd>
+            <dt class="col-5 text-muted small">Ciudad</dt>
+            <dd class="col-7">{{ cliente.ciudad }}</dd>
+            <dt class="col-5 text-muted small">Dirección</dt>
+            <dd class="col-7">{{ cliente.direccion }}</dd>
+            <dt class="col-5 text-muted small">Estado</dt>
+            <dd class="col-7">
+              {% if cliente.estado == 'activo' %}
+                <span class="badge bg-success">Activo</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactivo</span>
+              {% endif %}
+            </dd>
+          </dl>
+          <hr class="my-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted small fw-semibold">Balance pendiente</span>
+            {% with balance=cliente.balance %}
+              {% if balance > 0 %}
+                <span class="fw-bold text-danger">${{ balance|intcomma }}</span>
+              {% else %}
+                <span class="fw-bold text-success">$0 — Al día</span>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-bold mb-0">Accesos rápidos</h6>
+        </div>
+        <div class="card-body d-flex flex-column gap-2">
+          <a href="{% url 'catalogo:catalogo_cliente' %}"
+             class="btn btn-outline-primary">
+            <i class="bi bi-grid me-2"></i>Ver Catálogo
+          </a>
+          <a href="{% url 'carrito:ver_carrito' %}"
+             class="btn btn-outline-primary">
+            <i class="bi bi-cart me-2"></i>Mi Carrito
+          </a>
+          <a href="{% url 'pedidos:mis_pedidos' %}"
+             class="btn btn-outline-primary">
+            <i class="bi bi-bag me-2"></i>Mis Pedidos
+          </a>
+        </div>
+      </div>
+
+      <!-- Balance detalle -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-bottom py-3">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-cash-stack me-2 text-danger"></i>Mis Pedidos Pendientes de Pago
+          </h6>
+        </div>
+        <div class="card-body p-0">
+          {% load humanize %}
+          {% if pedidos_pendientes %}
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3">#</th>
+                    <th>Fecha</th>
+                    <th class="text-end pe-3">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in pedidos_pendientes %}
+                  <tr>
+                    <td class="ps-3 fw-semibold">#{{ p.id }}</td>
+                    <td class="text-muted small">{{ p.fecha|date:"d/m/Y" }}</td>
+                    <td class="text-end pe-3 fw-bold text-danger">${{ p.total|intcomma }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                  <tr>
+                    <td colspan="2" class="ps-3 fw-bold">Total balance</td>
+                    <td class="text-end pe-3 fw-bold text-danger">
+                      ${{ cliente.balance|intcomma }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-4 text-muted">
+              <i class="bi bi-check-circle display-6 text-success d-block mb-2"></i>
+              Estás al día. Sin deudas pendientes.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

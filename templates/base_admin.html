@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Capital Sneakers ERP{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  {% load static %}
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="erp-body">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <img src="{% static 'img/logo.png' %}" alt="Capital Sneakers" style="height: 36px; width: auto;">
+        <div class="sidebar-logo">Capital<span>Sneakers</span></div>
+      </div>
+      <div class="sidebar-subtitle">Panel ERP</div>
+    </div>
+
+    <ul class="sidebar-nav">
+  <li class="nav-label">Principal</li>
+
+  <li>
+    <a href="{% url 'dashboard:admin_dashboard' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+      <i class="bi bi-grid-1x2"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+
+  <li class="nav-label">Catálogo</li>
+
+  <li>
+    <a href="{% url 'catalogo:lista_productos' %}"
+       class="nav-link {% if 'producto' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-shoe"></i>
+      <span>Productos</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'catalogo:lista_categorias' %}"
+       class="nav-link {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-tag"></i>
+      <span>Categorías</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'catalogo:lista_marcas' %}"
+       class="nav-link {% if 'marca' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-award"></i>
+      <span>Marcas</span>
+    </a>
+  </li>
+
+  <li class="nav-label">Operaciones</li>
+  <li class="nav-label">Compras</li>
+
+<li>
+    <a href="{% url 'compras:proveedor_lista' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'compras' and 'proveedor' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-truck"></i>
+        <span>Proveedores</span>
+    </a>
+</li>
+<li>
+    <a href="{% url 'compras:compra_lista' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'compras' and 'compra' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-cart-check"></i>
+        <span>Compras</span>
+    </a>
+</li>
+<li>
+    <a href="{% url 'compras:reporte_compras' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'compras' and 'reporte' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-bar-chart-line"></i>
+        <span>Reporte Compras</span>
+    </a>
+</li>
+
+  <li>
+    <a href="{% url 'inventario:lista' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'inventario' %}active{% endif %}">
+      <i class="bi bi-boxes"></i>
+      <span>Inventario</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'pedidos:pedido_lista' %}"
+       class="nav-link {% if 'pedido' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-bag-check"></i>
+      <span>Pedidos</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'devoluciones:lista' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'devoluciones' %}active{% endif %}">
+      <i class="bi bi-arrow-return-left"></i>
+      <span>Devoluciones</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'clientes:cliente_lista' %}"
+       class="nav-link {% if 'cliente' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people-fill"></i>
+      <span>Clientes</span>
+    </a>
+  </li>
+
+  <li class="nav-label">Reportes</li>
+
+  <li>
+    <a href="{% url 'reportes:ventas' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'reportes' and 'ventas' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-graph-up-arrow"></i>
+      <span>Ventas</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'reportes:inventario' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'reportes' and 'inventario' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-boxes"></i>
+      <span>Inventario</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'reportes:clientes' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'reportes' and 'clientes' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people-fill"></i>
+      <span>Clientes</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'reportes:productos' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'reportes' and 'productos' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-shoe"></i>
+      <span>Productos</span>
+    </a>
+  </li>
+
+  <li class="nav-label">Sistema</li>
+
+  <li>
+    <a href="{% url 'usuarios:usuario_lista' %}"
+       class="nav-link {% if request.resolver_match.app_name == 'usuarios' %}active{% endif %}">
+      <i class="bi bi-people-fill"></i>
+      <span>Usuarios</span>
+    </a>
+  </li>
+  <li>
+    <a href="/admin/" class="nav-link">
+      <i class="bi bi-gear"></i>
+      <span>Admin Django</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'accounts:logout' %}" class="nav-link nav-link-logout">
+      <i class="bi bi-box-arrow-left"></i>
+      <span>Cerrar sesión</span>
+    </a>
+  </li>
+</ul>
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="btn-toggle-sidebar" id="toggleSidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="topbar-right d-flex align-items-center gap-3">
+
+        <!-- Campana de notificaciones -->
+        <div class="dropdown">
+          <button class="btn position-relative p-0 border-0 bg-transparent" id="campanaBtn"
+                  data-bs-toggle="dropdown" aria-expanded="false" style="font-size:1.3rem; color:#555;">
+            <i class="bi bi-bell-fill" id="campanaIcono"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  id="contadorCampana" style="font-size:0.6rem; display:none;">0</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+               style="width:360px; border-radius:14px; overflow:hidden;" id="dropdownNotif">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2"
+                 style="background:#1a1a2e;">
+              <span class="text-white fw-semibold small"><i class="bi bi-bell me-2"></i>Notificaciones</span>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm text-white-50 p-0 border-0" style="font-size:0.75rem;"
+                        onclick="marcarTodasLeidas()">
+                  <i class="bi bi-check-all me-1"></i>Leer todas
+                </button>
+                <a href="{% url 'notificaciones:historial' %}"
+                   class="btn btn-sm text-white-50 p-0 border-0" style="font-size:0.75rem;">
+                  <i class="bi bi-clock-history me-1"></i>Historial
+                </a>
+              </div>
+            </div>
+            <div id="listaNotifDropdown" style="max-height:340px; overflow-y:auto;">
+              <div class="text-center text-muted py-4 small" id="sinNotifMsg">
+                <i class="bi bi-bell-slash d-block fs-4 mb-1"></i>Sin notificaciones nuevas
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topbar-user">
+          <i class="bi bi-person-circle me-1"></i>
+          <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+          <span class="badge-admin">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+      <div class="px-4 pt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Contenido de la página -->
+    <div class="page-content">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+
+  <!-- Toast container siempre disponible -->
+  <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;"></div>
+
+  <audio id="sonidoNotif" preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=notification-sound-7062.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% load static %}
+  <script src="{% static 'js/sidebar.js' %}"></script>
+
+  <!-- Sistema de notificaciones — FUERA del block extra_js para que nunca se sobreescriba -->
+  <script>
+  const NOTIF_URL    = "{% url 'notificaciones:recientes' %}";
+  const MARCAR_TODAS = "{% url 'notificaciones:marcar_todas_leidas' %}";
+  let ultimoId       = 0;
+  let primeraVez     = true;
+
+  function renderNotifDropdown(notifs) {
+    const lista    = document.getElementById('listaNotifDropdown');
+    const sinMsg   = document.getElementById('sinNotifMsg');
+    const contador = document.getElementById('contadorCampana');
+    const campana  = document.getElementById('campanaIcono');
+    if (!lista) return;
+    if (!notifs.length) {
+      sinMsg.style.display   = 'block';
+      contador.style.display = 'none';
+      campana.classList.remove('text-danger');
+      return;
+    }
+    sinMsg.style.display   = 'none';
+    contador.style.display = 'inline-block';
+    contador.textContent   = notifs.length > 9 ? '9+' : notifs.length;
+    campana.classList.add('text-danger');
+    lista.innerHTML = '';
+    notifs.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'p-3 border-bottom d-flex align-items-start gap-2';
+      div.innerHTML = `
+        <span class="bg-${n.color} bg-opacity-15 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+              style="width:36px;height:36px;">
+          <i class="bi ${n.icono} text-${n.color} small"></i>
+        </span>
+        <div class="flex-grow-1">
+          <div class="fw-semibold small">${n.titulo}</div>
+          <div class="text-muted" style="font-size:0.75rem;">${n.descripcion}</div>
+          <div class="text-muted" style="font-size:0.7rem;">${n.fecha} ${n.hora}</div>
+          <div class="d-flex gap-1 mt-1">
+            ${n.pedido_id ? `<a href="/pedidos/${n.pedido_id}/" class="btn btn-outline-primary btn-sm py-0" style="font-size:0.7rem;">Ver pedido</a>` : ''}
+            <button class="btn btn-outline-secondary btn-sm py-0" style="font-size:0.7rem;"
+                    onclick="marcarLeida(${n.id})">
+              <i class="bi bi-check"></i> Leída
+            </button>
+          </div>
+        </div>
+      `;
+      lista.appendChild(div);
+    });
+  }
+
+  function mostrarToast(n) {
+    const toast = document.createElement('div');
+    toast.className = 'toast show align-items-center border-0 mb-2';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-start gap-2">
+          <span class="bg-${n.color} bg-opacity-15 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width:36px;height:36px;">
+            <i class="bi ${n.icono} text-${n.color}"></i>
+          </span>
+          <div>
+            <div class="fw-semibold small">${n.titulo}</div>
+            <div class="text-muted" style="font-size:0.78rem;">${n.descripcion}</div>
+            <div class="text-muted" style="font-size:0.7rem;">${n.fecha} ${n.hora}</div>
+            ${n.pedido_id ? `<a href="/pedidos/${n.pedido_id}/" class="btn btn-primary btn-sm mt-1 py-0" style="font-size:0.75rem;">Ver pedido</a>` : ''}
+          </div>
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" onclick="this.closest('.toast').remove()"></button>
+      </div>
+    `;
+    document.getElementById('toastContainer').appendChild(toast);
+    setTimeout(() => toast.remove(), 6000);
+  }
+
+  function marcarLeida(pk) {
+    fetch(`/notificaciones/marcar/${pk}/`)
+      .then(r => r.json())
+      .then(() => pollNotificaciones());
+  }
+
+  function marcarTodasLeidas() {
+    fetch(MARCAR_TODAS)
+      .then(r => r.json())
+      .then(() => pollNotificaciones());
+  }
+
+  function pollNotificaciones() {
+    fetch(NOTIF_URL)
+      .then(r => r.json())
+      .then(data => {
+        const notifs = data.notificaciones;
+        renderNotifDropdown(notifs);
+        if (!primeraVez && notifs.length > 0) {
+          const nuevas = notifs.filter(n => n.id > ultimoId);
+          nuevas.forEach(n => {
+            mostrarToast(n);
+            document.getElementById('sonidoNotif')?.play().catch(() => {});
+          });
+        }
+        if (notifs.length > 0) {
+          ultimoId = Math.max(...notifs.map(n => n.id));
+        }
+        primeraVez = false;
+      })
+      .catch(() => {});
+  }
+
+  // Polling notificaciones cada 10 segundos
+  pollNotificaciones();
+  setInterval(pollNotificaciones, 10000);
+
+  // Auto-refresh de la página cada 15 segundos si el usuario no interactúa
+  let _userActivo = false;
+  let _userTimer  = null;
+
+  function _resetUserTimer() {
+    _userActivo = true;
+    clearTimeout(_userTimer);
+    _userTimer = setTimeout(() => { _userActivo = false; }, 8000);
+  }
+
+  document.addEventListener('mousemove', _resetUserTimer);
+  document.addEventListener('keypress',  _resetUserTimer);
+  document.addEventListener('click',     _resetUserTimer);
+  document.addEventListener('scroll',    _resetUserTimer);
+
+  setInterval(() => {
+    if (!_userActivo) location.reload();
+  }, 15000);
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

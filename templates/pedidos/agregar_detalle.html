@@ -1,0 +1,146 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Agregar Productos — Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'pedidos:pedido_detalle' pedido.id %}" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i> Detalle del pedido
+        </a>
+        <h2 class="fw-bold mb-0 mt-1">Agregar Productos</h2>
+        <small class="text-muted">Pedido #{{ pedido.id }} &mdash; {{ pedido.cliente.nombre_completo }}</small>
+    </div>
+    <a href="{% url 'pedidos:pedido_detalle' pedido.id %}"
+       class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-check-circle me-1"></i> Finalizar pedido
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <!-- Formulario agregar producto -->
+    <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Agregar producto</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} rounded-3 py-2 small mt-3">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+
+                    <!-- Producto -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Producto</label>
+                        {{ form.producto }}
+                        {% if form.producto.errors %}
+                            <div class="text-danger small mt-1">{{ form.producto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Talla -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Talla</label>
+                        {{ form.talla }}
+                        {% if form.talla.errors %}
+                            <div class="text-danger small mt-1">{{ form.talla.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Cantidad</label>
+                        {{ form.cantidad }}
+                        {% if form.cantidad.errors %}
+                            <div class="text-danger small mt-1">{{ form.cantidad.errors }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted small">
+                            El stock se descontará automáticamente del inventario.
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill py-2 fw-semibold">
+                            <i class="bi bi-plus-circle me-1"></i> Agregar al pedido
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos agregados -->
+    <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Productos agregados</h5>
+                <span class="badge bg-primary rounded-pill px-3">Total: ${{ pedido.total }}</span>
+            </div>
+            <div class="card-body p-0 mt-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Producto</th>
+                                <th class="text-center">Talla</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-end">Subtotal</th>
+                                <th class="text-center pe-4">Quitar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in detalles %}
+                            <tr>
+                                <td class="ps-4 fw-semibold">{{ detalle.producto.nombre }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border rounded-pill px-3">
+                                        {{ detalle.talla }}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-end fw-bold">${{ detalle.subtotal }}</td>
+                                <td class="text-center pe-4">
+                                    <a href="{% url 'pedidos:pedido_eliminar_detalle' detalle.id %}"
+                                       class="btn btn-sm btn-outline-danger rounded-pill"
+                                       onclick="return confirm('¿Quitar este producto del pedido?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-bag fs-3 d-block mb-2"></i>
+                                    Sin productos aún. Agrega el primero.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if detalles %}
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="ps-4 fw-bold text-end">Total</td>
+                                <td class="text-end fw-bold">${{ pedido.total }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

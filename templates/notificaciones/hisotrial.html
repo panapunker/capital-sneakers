@@ -1,0 +1,132 @@
+{% extends "dashboard/base_admin.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0"><i class="bi bi-bell-fill me-2 text-warning"></i>Notificaciones</h4>
+        <small class="text-muted">Historial completo de notificaciones del sistema</small>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" onclick="marcarTodas()">
+        <i class="bi bi-check-all me-1"></i> Marcar todas como leídas
+    </button>
+</div>
+
+<!-- Filtros -->
+<div class="card border-0 shadow-sm rounded-3 mb-4 p-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+            <label class="form-label small fw-semibold">Tipo</label>
+            <select name="tipo" class="form-select form-select-sm">
+                <option value="">Todos los tipos</option>
+                {% for valor, etiqueta in tipos %}
+                    <option value="{{ valor }}" {% if filtro_tipo == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label small fw-semibold">Estado</label>
+            <select name="leida" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                <option value="0" {% if filtro_leida == '0' %}selected{% endif %}>No leídas</option>
+                <option value="1" {% if filtro_leida == '1' %}selected{% endif %}>Leídas</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+            <a href="{% url 'notificaciones:historial' %}" class="btn btn-outline-secondary btn-sm w-100">
+                <i class="bi bi-x"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Lista -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        {% for n in notificaciones %}
+        <div class="d-flex align-items-start p-3 border-bottom notif-item {% if not n.leida %}bg-light{% endif %}" id="notif-{{ n.pk }}">
+            <div class="me-3 mt-1">
+                <span class="bg-{{ n.color }} bg-opacity-15 rounded-circle d-flex align-items-center justify-content-center"
+                      style="width:42px;height:42px;">
+                    <i class="bi {{ n.icono }} text-{{ n.color }}"></i>
+                </span>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="fw-semibold small">{{ n.titulo }}</div>
+                        {% if n.descripcion %}
+                            <div class="text-muted small mt-1">{{ n.descripcion }}</div>
+                        {% endif %}
+                        {% if n.usuario %}
+                            <span class="badge bg-light text-secondary border mt-1 small">
+                                <i class="bi bi-person me-1"></i>{{ n.usuario.get_full_name|default:n.usuario.username }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="text-end ms-3">
+                        <div class="text-muted small">{{ n.fecha|date:"d/m/Y" }}</div>
+                        <div class="text-muted small">{{ n.fecha|date:"H:i" }}</div>
+                        {% if not n.leida %}
+                            <span class="badge bg-danger mt-1">Nueva</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    {% if n.pedido_id %}
+                        <a href="{% url 'pedidos:pedido_detalle' n.pedido_id %}"
+                           class="btn btn-outline-primary btn-sm" style="font-size:0.75rem;">
+                            <i class="bi bi-eye me-1"></i>Ver Pedido
+                        </a>
+                    {% endif %}
+                    {% if not n.leida %}
+                        <button class="btn btn-outline-secondary btn-sm" style="font-size:0.75rem;"
+                                onclick="marcarLeida({{ n.pk }})">
+                            <i class="bi bi-check me-1"></i>Marcar leída
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-bell-slash fs-2 d-block mb-2"></i>
+            No hay notificaciones.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function marcarLeida(pk) {
+    fetch(`/notificaciones/marcar/${pk}/`, {
+        method: 'GET',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            const el = document.getElementById(`notif-${pk}`);
+            el.classList.remove('bg-light');
+            el.querySelector('.badge.bg-danger')?.remove();
+            el.querySelector(`button[onclick="marcarLeida(${pk})"]`)?.remove();
+        }
+    });
+}
+
+function marcarTodas() {
+    fetch('/notificaciones/marcar-todas/', {
+        method: 'GET',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) location.reload();
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

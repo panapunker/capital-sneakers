@@ -1,0 +1,275 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'pedidos:pedido_lista' %}" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i> Pedidos
+        </a>
+        <h2 class="fw-bold mb-0 mt-1">Pedido #{{ pedido.id }}</h2>
+        <small class="text-muted">
+            {{ pedido.fecha|date:"d/m/Y H:i" }} &mdash; {{ pedido.cliente.nombre_completo }}
+        </small>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        {% if not pedido.facturado and pedido.estado != 'cancelado' %}
+            <a href="{% url 'pedidos:pedido_agregar_detalle' pedido.id %}"
+               class="btn btn-outline-primary rounded-pill px-4">
+                <i class="bi bi-plus-circle me-1"></i> Agregar producto
+            </a>
+            <a href="{% url 'pedidos:pedido_estado' pedido.id %}"
+               class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-repeat me-1"></i> Cambiar estado
+            </a>
+            <form method="post" action="{% url 'pedidos:facturar_pedido' pedido.id %}"
+                  class="d-inline"
+                  onsubmit="return confirm('¿Facturar el pedido #{{ pedido.id }}? Esto eliminará el balance del cliente.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success rounded-pill px-4">
+                    <i class="bi bi-receipt me-1"></i> Facturar
+                </button>
+            </form>
+            <form method="post" action="{% url 'pedidos:devolver_pedido' pedido.id %}"
+                  class="d-inline"
+                  onsubmit="return confirm('¿Procesar devolución del pedido #{{ pedido.id }}? Se restaurará el stock.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning rounded-pill px-4">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Devolución rápida
+                </button>
+            </form>
+            <a href="{% url 'devoluciones:crear' pedido.id %}"
+               class="btn btn-outline-warning rounded-pill px-4">
+                <i class="bi bi-arrow-return-left me-1"></i> Devolución detallada
+            </a>
+        {% endif %}
+
+        {% if pedido.facturado %}
+            <span class="btn btn-success rounded-pill px-4 disabled">
+                <i class="bi bi-check-circle me-1"></i> Facturado
+            </span>
+        {% endif %}
+
+        {% if pedido.estado == 'cancelado' %}
+            <span class="btn btn-danger rounded-pill px-4 disabled">
+                <i class="bi bi-x-circle me-1"></i> Devuelto / Cancelado
+            </span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Tarjetas resumen -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Estado</p>
+                {% if pedido.estado == 'pendiente' %}
+                    <span class="badge bg-warning text-dark rounded-pill px-3 fs-6">Pendiente</span>
+                {% elif pedido.estado == 'confirmado' %}
+                    <span class="badge bg-primary rounded-pill px-3 fs-6">Confirmado</span>
+                {% elif pedido.estado == 'enviado' %}
+                    <span class="badge bg-info text-dark rounded-pill px-3 fs-6">Enviado</span>
+                {% elif pedido.estado == 'entregado' %}
+                    <span class="badge bg-success rounded-pill px-3 fs-6">Entregado</span>
+                {% elif pedido.estado == 'cancelado' %}
+                    <span class="badge bg-danger rounded-pill px-3 fs-6">Cancelado</span>
+                {% endif %}
+                {% if pedido.facturado %}
+                    <br><span class="badge bg-success rounded-pill px-2 mt-1" style="font-size:0.7rem;">
+                        <i class="bi bi-receipt me-1"></i>Facturado
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Total pedido</p>
+                <h3 class="fw-bold mb-0">${{ pedido.total }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Método de pago</p>
+                <h6 class="fw-bold mb-0">{{ pedido.get_metodo_pago_display }}</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Productos</p>
+                <h3 class="fw-bold mb-0">{{ detalles.count }}</h3>
+                <small class="text-muted">referencias</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- Detalles del pedido -->
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Productos del pedido</h5>
+            </div>
+            <div class="card-body p-0 mt-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Producto</th>
+                                <th class="text-center">Talla</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-end">Precio unit.</th>
+                                <th class="text-end">Subtotal</th>
+                                {% if not pedido.facturado and pedido.estado != 'cancelado' %}
+                                <th class="text-center pe-4">Acción</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in detalles %}
+                            <tr {% if detalle.devuelto %}class="table-secondary text-decoration-line-through"{% endif %}>
+                                <td class="ps-4 fw-semibold">
+                                    {{ detalle.producto.nombre }}
+                                    {% if detalle.devuelto %}
+                                        <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">Devuelto</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border rounded-pill px-3">
+                                        {{ detalle.talla }}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-end text-muted">${{ detalle.precio_unitario }}</td>
+                                <td class="text-end fw-bold">${{ detalle.subtotal }}</td>
+                                {% if not pedido.facturado and pedido.estado != 'cancelado' %}
+                                <td class="text-center pe-4">
+                                    {% if not detalle.devuelto %}
+                                    <a href="{% url 'pedidos:pedido_eliminar_detalle' detalle.id %}"
+                                       class="btn btn-sm btn-outline-danger rounded-pill"
+                                       onclick="return confirm('¿Eliminar este producto del pedido?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-bag fs-3 d-block mb-2"></i>
+                                    Sin productos agregados.
+                                    <div class="mt-2">
+                                        <a href="{% url 'pedidos:pedido_agregar_detalle' pedido.id %}"
+                                           class="btn btn-primary rounded-pill px-4">
+                                            <i class="bi bi-plus-circle me-1"></i> Agregar producto
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if detalles %}
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="4" class="ps-4 fw-bold text-end">Total</td>
+                                <td class="text-end fw-bold">${{ pedido.total }}</td>
+                                {% if not pedido.facturado and pedido.estado != 'cancelado' %}
+                                <td></td>
+                                {% endif %}
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del cliente y pedido -->
+    <div class="col-12 col-lg-4">
+
+        <!-- Cliente -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Cliente</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <p class="fw-semibold mb-1">{{ pedido.cliente.nombre_completo }}</p>
+                <p class="text-muted small mb-1">Doc: {{ pedido.cliente.documento }}</p>
+                <p class="text-muted small mb-1">Tel: {{ pedido.cliente.telefono }}</p>
+                <p class="text-muted small mb-1">{{ pedido.cliente.ciudad }}</p>
+                <p class="text-muted small mb-3">{{ pedido.cliente.direccion }}</p>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-muted small fw-semibold">Balance pendiente</span>
+                    {% with balance=pedido.cliente.balance %}
+                        {% if balance > 0 %}
+                            <span class="fw-bold text-danger">${{ balance }}</span>
+                        {% else %}
+                            <span class="fw-bold text-success">$0 — Al día</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del pedido -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Información</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <table class="table table-borderless mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted ps-0">Registrado por</td>
+                            <td class="fw-semibold">
+                                {{ pedido.usuario.get_full_name|default:pedido.usuario.username|default:"—" }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted ps-0">Fecha</td>
+                            <td class="fw-semibold">{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted ps-0">Actualizado</td>
+                            <td class="fw-semibold">{{ pedido.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% if pedido.facturado and pedido.fecha_factura %}
+                        <tr>
+                            <td class="text-muted ps-0">Facturado</td>
+                            <td class="fw-semibold text-success">
+                                {{ pedido.fecha_factura|date:"d/m/Y H:i" }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% if pedido.observaciones %}
+                <hr>
+                <p class="text-muted small mb-1">Observaciones</p>
+                <p class="small mb-0">{{ pedido.observaciones }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'pedidos:pedido_lista' %}" class="btn btn-outline-secondary rounded-pill px-4">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+    </a>
+</div>
+
+{% endblock %}

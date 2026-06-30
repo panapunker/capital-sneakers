@@ -1,0 +1,68 @@
+{% extends 'base_cliente.html' %}
+{% load humanize %}
+
+{% block title %}Mis Pedidos — Capital Sneakers{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-bag me-2 text-primary"></i>Mis Pedidos</h4>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">#</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Método Pago</th>
+            <th class="text-end">Total</th>
+            <th class="text-center pe-3">Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in pedidos %}
+          <tr>
+            <td class="ps-3 fw-bold">#{{ pedido.id }}</td>
+            <td class="text-muted small">{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if pedido.estado == 'pendiente' %}
+                <span class="badge bg-warning text-dark">Pendiente</span>
+              {% elif pedido.estado == 'confirmado' %}
+                <span class="badge bg-primary">Confirmado</span>
+              {% elif pedido.estado == 'enviado' %}
+                <span class="badge bg-info">Enviado</span>
+              {% elif pedido.estado == 'entregado' %}
+                <span class="badge bg-success">Entregado</span>
+              {% elif pedido.estado == 'cancelado' %}
+                <span class="badge bg-danger">Cancelado</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ pedido.estado }}</span>
+              {% endif %}
+            </td>
+            <td>{{ pedido.get_metodo_pago_display }}</td>
+            <td class="text-end fw-bold">${{ pedido.total|intcomma }}</td>
+            <td class="text-center pe-3">
+              <a href="{% url 'pedidos:mi_pedido_detalle' pedido.id %}"
+                 class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-5">
+              <i class="bi bi-bag-x fs-1 d-block mb-2"></i>
+              Aún no tienes pedidos.
+              <a href="{% url 'catalogo:catalogo_cliente' %}" class="d-block mt-2">
+                Ver catálogo
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

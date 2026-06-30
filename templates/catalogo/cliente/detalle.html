@@ -1,0 +1,89 @@
+{% extends 'base_cliente.html' %}
+{% load humanize %}
+
+{% block title %}{{ producto.nombre }} — Capital Sneakers{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'catalogo:catalogo_cliente' %}">Catálogo</a>
+      </li>
+      <li class="breadcrumb-item active">{{ producto.nombre }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Imagen -->
+    <div class="col-12 col-md-5">
+      <div class="card border-0 shadow-sm">
+        {% if producto.imagen_principal %}
+          <img src="{{ producto.imagen_principal.url }}"
+               class="card-img-top rounded"
+               style="object-fit:cover;max-height:400px;"
+               alt="{{ producto.nombre }}">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light rounded"
+               style="height:400px;">
+            <i class="bi bi-image text-muted" style="font-size:4rem;"></i>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info y carrito -->
+    <div class="col-12 col-md-7">
+      <p class="text-muted mb-1">{{ producto.marca.nombre }} · {{ producto.categoria.nombre }}</p>
+      <h3 class="fw-bold mb-2">{{ producto.nombre }}</h3>
+      <p class="text-muted small mb-2">Ref: {{ producto.referencia }}</p>
+      <h4 class="text-primary fw-bold mb-4">${{ producto.precio_venta|intcomma }}</h4>
+
+      {% if stock_tallas %}
+      <form method="post" action="{% url 'carrito:agregar_item' %}">
+        {% csrf_token %}
+        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Talla</label>
+          <div class="d-flex flex-wrap gap-2">
+            {% for inv in stock_tallas %}
+            <div>
+              <input type="radio" class="btn-check" name="talla"
+                     id="talla_{{ inv.talla }}" value="{{ inv.talla }}" required>
+              <label class="btn btn-outline-primary btn-sm" for="talla_{{ inv.talla }}">
+                {{ inv.talla }}
+                <span class="text-muted small">({{ inv.cantidad }})</span>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Cantidad</label>
+          <input type="number" name="cantidad" value="1" min="1"
+                 class="form-control" style="width:100px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
+        </button>
+        <a href="{% url 'catalogo:catalogo_cliente' %}"
+           class="btn btn-outline-secondary ms-2">
+          Volver
+        </a>
+      </form>
+      {% else %}
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Este producto no tiene stock disponible.
+      </div>
+      <a href="{% url 'catalogo:catalogo_cliente' %}" class="btn btn-outline-secondary">
+        Volver al catálogo
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

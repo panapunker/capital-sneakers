@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Factura #{{ pedido.id }} — Capital Sneakers</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #111; padding: 40px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 3px solid #111; padding-bottom: 16px; }
+    .brand { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+    .brand span { color: #c0392b; }
+    .brand-sub { font-size: 11px; color: #666; margin-top: 2px; }
+    .factura-info { text-align: right; }
+    .factura-info h2 { font-size: 20px; font-weight: 800; color: #c0392b; }
+    .factura-info p { font-size: 12px; color: #666; margin-top: 2px; }
+    .section { margin-bottom: 24px; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    .row-2 { display: flex; gap: 32px; }
+    .row-2 > div { flex: 1; }
+    .info-line { margin-bottom: 4px; font-size: 12px; }
+    .info-line span { color: #666; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    thead tr { background: #111; color: #fff; }
+    th { padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #eee; font-size: 12px; }
+    tbody tr:last-child td { border-bottom: none; }
+    tfoot tr { background: #f8f8f8; font-weight: 700; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .total-box { margin-top: 24px; text-align: right; }
+    .total-box .total-label { font-size: 13px; color: #666; }
+    .total-box .total-value { font-size: 24px; font-weight: 900; color: #c0392b; }
+    .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 16px; }
+    .badge-pagado { display: inline-block; background: #d1e7dd; color: #0a3622; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    @media print {
+      body { padding: 20px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Botón imprimir (solo pantalla) -->
+  <div class="no-print" style="margin-bottom:20px; display:flex; gap:10px;">
+    <button onclick="window.print()"
+            style="background:#111;color:#fff;border:none;padding:8px 20px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;">
+      🖨️ Imprimir / Guardar PDF
+    </button>
+    <a href="/pedidos/{{ pedido.id }}/"
+       style="background:#eee;color:#111;border:none;padding:8px 20px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;text-decoration:none;">
+      ← Volver al pedido
+    </a>
+  </div>
+
+  <!-- Encabezado -->
+  <div class="header">
+    <div>
+      <div class="brand">Capital<span>Sneakers</span></div>
+      <div class="brand-sub">ERP — Sistema de Gestión</div>
+    </div>
+    <div class="factura-info">
+      <h2>FACTURA #{{ pedido.id }}</h2>
+      <p>Fecha: {{ pedido.fecha_factura|date:"d/m/Y H:i" }}</p>
+      <p>Pedido: {{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+      <p style="margin-top:6px;"><span class="badge-pagado">✓ Pagado</span></p>
+    </div>
+  </div>
+
+  <!-- Datos cliente y pago -->
+  <div class="row-2 section">
+    <div>
+      <div class="section-title">Cliente</div>
+      <div class="info-line"><strong>{{ pedido.cliente.nombre_completo }}</strong></div>
+      <div class="info-line"><span>Doc:</span> {{ pedido.cliente.documento }}</div>
+      <div class="info-line"><span>Tel:</span> {{ pedido.cliente.telefono }}</div>
+      <div class="info-line"><span>Ciudad:</span> {{ pedido.cliente.ciudad }}</div>
+      <div class="info-line"><span>Dirección:</span> {{ pedido.cliente.direccion }}</div>
+      <div class="info-line"><span>Correo:</span> {{ pedido.cliente.correo }}</div>
+    </div>
+    <div>
+      <div class="section-title">Información de pago</div>
+      <div class="info-line"><span>Método:</span> <strong>{{ pedido.get_metodo_pago_display }}</strong></div>
+      <div class="info-line"><span>Estado:</span> <strong>{{ pedido.get_estado_display }}</strong></div>
+      <div class="info-line"><span>Facturado por:</span> {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</div>
+      {% if pedido.observaciones %}
+      <div class="info-line" style="margin-top:8px;"><span>Obs:</span> {{ pedido.observaciones }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Productos -->
+  <div class="section">
+    <div class="section-title">Productos</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th class="text-center">Talla</th>
+          <th class="text-center">Cantidad</th>
+          <th class="text-right">Precio unit.</th>
+          <th class="text-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detalle in detalles %}
+        <tr>
+          <td>
+            <strong>{{ detalle.producto.nombre }}</strong><br>
+            <span style="color:#666;font-size:11px;">
+              {{ detalle.producto.marca.nombre }} · Ref: {{ detalle.producto.referencia }}
+            </span>
+          </td>
+          <td class="text-center">{{ detalle.talla }}</td>
+          <td class="text-center">{{ detalle.cantidad }}</td>
+          <td class="text-right">${{ detalle.precio_unitario }}</td>
+          <td class="text-right"><strong>${{ detalle.subtotal }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="text-right">TOTAL</td>
+          <td class="text-right" style="color:#c0392b;font-size:15px;">${{ pedido.total }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Capital Sneakers · Gracias por tu compra</p>
+    <p style="margin-top:4px;">Este documento es válido como comprobante de pago.</p>
+  </div>
+
+</body>
+</html>

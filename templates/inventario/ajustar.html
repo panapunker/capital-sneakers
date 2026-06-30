@@ -1,0 +1,98 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Ajustar Inventario - {{ producto.nombre }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'inventario:detalle' producto.id %}" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i> Detalle de inventario
+        </a>
+        <h2 class="fw-bold mb-0 mt-1">Ajustar Stock</h2>
+        <small class="text-muted">{{ producto.nombre }} &mdash; {{ producto.marca }} &mdash; Ref: {{ producto.referencia }}</small>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- Formulario -->
+    <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Registrar movimiento</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} rounded-3 py-2 small">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+
+                    <!-- Talla -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Talla</label>
+                        <select name="talla" class="form-select rounded-3" required>
+                            <option value="">Seleccionar talla...</option>
+                            {% for valor, etiqueta in tallas_choices %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo de movimiento</label>
+                        <div class="d-flex gap-2">
+                            <div class="form-check form-check-inline flex-fill">
+                                <input class="form-check-input" type="radio" name="tipo"
+                                       id="tipo_entrada" value="entrada" checked>
+                                <label class="form-check-label w-100 btn btn-outline-success rounded-pill text-center py-2"
+                                       for="tipo_entrada">
+                                    <i class="bi bi-arrow-down-circle me-1"></i> Entrada
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline flex-fill">
+                                <input class="form-check-input" type="radio" name="tipo"
+                                       id="tipo_salida" value="salida">
+                                <label class="form-check-label w-100 btn btn-outline-danger rounded-pill text-center py-2"
+                                       for="tipo_salida">
+                                    <i class="bi bi-arrow-up-circle me-1"></i> Salida
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline flex-fill">
+                                <input class="form-check-input" type="radio" name="tipo"
+                                       id="tipo_ajuste" value="ajuste">
+                                <label class="form-check-label w-100 btn btn-outline-warning rounded-pill text-center py-2"
+                                       for="tipo_ajuste">
+                                    <i class="bi bi-sliders me-1"></i> Ajuste
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Cantidad</label>
+                        <input type="number" name="cantidad" min="1" value="1"
+                               class="form-control rounded-3" required>
+                        <div class="form-text text-muted small">
+                            En <strong>Ajuste manual</strong> la cantidad reemplaza el stock actual.
+                        </div>
+                    </div>
+
+                    <!-- Observación -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Observación <span class="text-muted fw-normal">(opcional)</span></label>
+                        <textarea name="observacion" class="form-control rounded-3" rows="2"
+                                  placeholder="Ej: Compra proveedor, ajuste por inventario físico..."></textarea>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill py-2 fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i> Registrar movimiento
+                        </button>

@@ -1,0 +1,155 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Usuarios</h4>
+      <small class="text-muted">Gestión de usuarios del sistema</small>
+    </div>
+    <a href="{% url 'usuarios:usuario_crear' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Nuevo Usuario
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Filtros -->
+  <div class="card border-0 shadow-sm rounded-3 mb-4 p-3">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label small fw-semibold">Buscar</label>
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Usuario, nombre o correo...">
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small fw-semibold">Rol</label>
+        <select name="rol" class="form-select">
+          <option value="">Todos</option>
+          {% for valor, etiqueta in roles %}
+            <option value="{{ valor }}" {% if rol == valor %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label small fw-semibold">Estado</label>
+        <select name="estado" class="form-select">
+          <option value="">Todos</option>
+          <option value="1" {% if estado == '1' %}selected{% endif %}>Activos</option>
+          <option value="0" {% if estado == '0' %}selected{% endif %}>Inactivos</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search"></i>
+        </button>
+        <a href="{% url 'usuarios:usuario_lista' %}" class="btn btn-outline-secondary w-100">
+          <i class="bi bi-x"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Usuario</th>
+              <th>Nombre completo</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Último acceso</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in page_obj %}
+            <tr>
+              <td class="fw-semibold">
+                <i class="bi bi-person-circle me-1 text-muted"></i>{{ usuario.username }}
+              </td>
+              <td>{{ usuario.get_full_name|default:"—" }}</td>
+              <td>{{ usuario.email|default:"—" }}</td>
+              <td>
+                {% if usuario.rol == 'admin' %}
+                  <span class="badge bg-primary">{{ usuario.get_rol_display }}</span>
+                {% else %}
+                  <span class="badge bg-info text-dark">{{ usuario.get_rol_display }}</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">
+                {% if usuario.last_login %}
+                  {{ usuario.last_login|date:"d/m/Y H:i" }}
+                {% else %}
+                  Nunca
+                {% endif %}
+              </td>
+              <td>
+                {% if usuario.activo %}
+                  <span class="badge bg-success">Activo</span>
+                {% else %}
+                  <span class="badge bg-secondary">Inactivo</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a href="{% url 'usuarios:usuario_detalle' usuario.pk %}" class="btn btn-sm btn-outline-info" title="Ver">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{% url 'usuarios:usuario_editar' usuario.pk %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  {% if usuario.activo %}
+                    <a href="{% url 'usuarios:usuario_desactivar' usuario.pk %}" class="btn btn-sm btn-outline-danger" title="Desactivar"
+                       onclick="return confirm('¿Desactivar este usuario?');">
+                      <i class="bi bi-slash-circle"></i>
+                    </a>
+                  {% else %}
+                    <a href="{% url 'usuarios:usuario_activar' usuario.pk %}" class="btn btn-sm btn-outline-success" title="Activar">
+                      <i class="bi bi-check-circle"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay usuarios registrados.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&rol={{ rol }}&estado={{ estado }}">Anterior</a></li>
+      {% endif %}
+      <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&rol={{ rol }}&estado={{ estado }}">Siguiente</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+</div>
+{% endblock %}

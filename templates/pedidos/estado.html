@@ -1,0 +1,100 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Cambiar Estado — Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'pedidos:pedido_detalle' pedido.id %}" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i> Detalle del pedido
+        </a>
+        <h2 class="fw-bold mb-0 mt-1">Cambiar Estado</h2>
+        <small class="text-muted">Pedido #{{ pedido.id }} &mdash; {{ pedido.cliente.nombre_completo }}</small>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-6">
+
+        <!-- Estado actual -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
+                <div>
+                    <p class="text-muted small mb-1">Estado actual</p>
+                    {% if pedido.estado == 'pendiente' %}
+                        <span class="badge bg-warning text-dark rounded-pill px-3 fs-6">Pendiente</span>
+                    {% elif pedido.estado == 'confirmado' %}
+                        <span class="badge bg-primary rounded-pill px-3 fs-6">Confirmado</span>
+                    {% elif pedido.estado == 'enviado' %}
+                        <span class="badge bg-info text-dark rounded-pill px-3 fs-6">Enviado</span>
+                    {% elif pedido.estado == 'entregado' %}
+                        <span class="badge bg-success rounded-pill px-3 fs-6">Entregado</span>
+                    {% elif pedido.estado == 'cancelado' %}
+                        <span class="badge bg-danger rounded-pill px-3 fs-6">Cancelado</span>
+                    {% elif pedido.estado == 'devuelto' %}
+                        <span class="badge bg-secondary rounded-pill px-3 fs-6">Devuelto</span>
+                    {% endif %}
+                </div>
+                <div class="ms-auto text-end">
+                    <p class="text-muted small mb-1">Total del pedido</p>
+                    <h5 class="fw-bold mb-0">${{ pedido.total }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario cambio de estado -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">Actualizar estado</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} rounded-3 py-2 small mt-3">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+
+                    <!-- Estado -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nuevo estado</label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                            <div class="text-danger small mt-1">{{ form.estado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Observaciones <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i> Guardar cambio
+                        </button>
+                        <a href="{% url 'pedidos:pedido_detalle' pedido.id %}"
+                           class="btn btn-outline-secondary rounded-pill px-4">
+                            Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Devolución #{{ devolucion.id }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; color: #222; }
+    h1 { font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; font-size: 13px; text-align: left; }
+    th { background: #f0f0f0; }
+    .info p { margin: 4px 0; font-size: 14px; }
+    @media print {
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Devolución #{{ devolucion.id }} — Capital Sneakers</h1>
+
+  <div class="info">
+    <p><strong>Pedido:</strong> #{{ devolucion.pedido_id }}</p>
+    <p><strong>Cliente:</strong> {{ devolucion.cliente.nombre_completo }} ({{ devolucion.cliente.documento }})</p>
+    <p><strong>Tipo:</strong> {{ devolucion.get_tipo_display }}</p>
+    <p><strong>Estado:</strong> {{ devolucion.get_estado_display }}</p>
+    <p><strong>Motivo:</strong> {{ devolucion.motivo }}</p>
+    <p><strong>Fecha:</strong> {{ devolucion.fecha|date:"d/m/Y H:i" }}</p>
+    <p><strong>Registrada por:</strong> {{ devolucion.usuario.get_full_name|default:devolucion.usuario.username }}</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Talla</th>
+        <th>Cantidad</th>
+        <th>Estado</th>
+        <th>Cambio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in detalles %}
+      <tr>
+        <td>{{ d.producto.nombre }}</td>
+        <td>{{ d.talla }}</td>
+        <td>{{ d.cantidad }}</td>
+        <td>{{ d.get_estado_producto_display }}</td>
+        <td>
+          {% if d.es_cambio_talla %}Talla {{ d.talla_nueva }}
+          {% elif d.es_cambio_producto %}{{ d.producto_nuevo.nombre }}
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button class="no-print" onclick="window.print()" style="margin-top:20px;padding:8px 16px;">
+    Imprimir
+  </button>
+
+</body>
+</html>

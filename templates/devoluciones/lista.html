@@ -1,0 +1,125 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Devoluciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">
+        <i class="bi bi-arrow-return-left me-2 text-primary"></i>Devoluciones
+      </h2>
+      <small class="text-muted">{{ devoluciones.count }} registros</small>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Filtros -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-6 col-md-2">
+          <label class="form-label small fw-semibold">Desde</label>
+          {{ form.fecha_inicio }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label small fw-semibold">Hasta</label>
+          {{ form.fecha_fin }}
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small fw-semibold">Cliente</label>
+          {{ form.cliente }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label small fw-semibold"># Pedido</label>
+          {{ form.pedido_id }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label small fw-semibold">Estado</label>
+          {{ form.estado }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label small fw-semibold">Tipo</label>
+          {{ form.tipo }}
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small fw-semibold">Buscar</label>
+          {{ form.buscar }}
+        </div>
+        <div class="col-12 col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-funnel me-1"></i>Filtrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3">#</th>
+              <th>Pedido</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dev in devoluciones %}
+            <tr>
+              <td class="ps-3 fw-semibold">#{{ dev.id }}</td>
+              <td>
+                <a href="{% url 'pedidos:pedido_detalle' dev.pedido_id %}" class="text-decoration-none">
+                  #{{ dev.pedido_id }}
+                </a>
+              </td>
+              <td>{{ dev.cliente.nombre_completo }}</td>
+              <td>{{ dev.get_tipo_display }}</td>
+              <td>
+                {% if dev.estado == 'pendiente' %}
+                  <span class="badge bg-warning text-dark">Pendiente</span>
+                {% elif dev.estado == 'aprobada' %}
+                  <span class="badge bg-success">Aprobada</span>
+                {% elif dev.estado == 'rechazada' %}
+                  <span class="badge bg-danger">Rechazada</span>
+                {% elif dev.estado == 'finalizada' %}
+                  <span class="badge bg-secondary">Finalizada</span>
+                {% endif %}
+              </td>
+              <td class="text-muted small">{{ dev.fecha|date:"d/m/Y H:i" }}</td>
+              <td class="text-center">
+                <a href="{% url 'devoluciones:detalle' dev.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">No hay devoluciones registradas</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
